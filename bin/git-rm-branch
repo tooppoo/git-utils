@@ -1,0 +1,119 @@
+#!/bin/sh
+
+set -eu
+
+command_name="git rm-branch"
+
+main() {
+  dry_run=0
+  force=0
+
+  while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --dry-run)
+    dry_run=1
+    shift
+    ;;
+    --force|-f)
+    force=1
+    shift
+    ;;
+    --help|-h)
+    usage
+    exit 0
+    ;;
+    --)
+    shift
+    break
+    ;;
+    -*)
+    die "unknown option: $1"
+    ;;
+    *)
+    break
+    ;;
+  esac
+  done
+
+  if [ "$#" -eq 0 ]; then
+  usage
+  exit 2
+  fi
+
+  git rev-parse --git-dir >/dev/null 2>&1 ||
+    die "not a git repository"
+
+  current_branch=$(
+    git symbolic-ref --quiet --short HEAD 2>/dev/null || true
+  )
+
+  branches=$(
+    git for-each-ref --format='%(refname:short)' refs/heads
+  )
+
+  matched=''
+
+  for branch in $branches; do
+  for pattern in "$@"; do
+    case "$branch" in
+    $pattern)
+      if [ "$branch" = "$current_branch" ]; then
+        die "refusing to delete current branch: $branch"
+      fi
+
+      case "
+$matched
+" in
+      *"
+$branch
+"*)
+        ;;
+      *)
+        matched="${matched}${branch}
+"
+        ;;
+      esac
+
+      break
+      ;;
+    esac
+  done
+  done
+
+  if [ -z "$matched" ]; then
+  die "no branches matched"
+  fi
+
+  if [ "$dry_run" -eq 1 ]; then
+  printf '%s' "$matched"
+  exit 0
+  fi
+
+  printf '%s' "$matched" | while IFS= read -r branch; do
+  [ -n "$branch" ] || continue
+
+  if [ "$force" -eq 1 ]; then
+      git branch -D "$branch"
+  else
+      git branch -d "$branch"
+  fi
+  done
+}
+
+usage() {
+  cat >&2 <<EOF
+Usage:
+  $command_name [--dry-run] [--force] <glob-pattern>...
+
+Options:
+  --dry-run   Show matched branches without deleting them
+  --force     Delete branches with git branch -D instead of git branch -d
+EOF
+}
+
+die() {
+  printf '%s: %s\n' "$command_name" "$1" >&2
+  exit 1
+}
+
+main
