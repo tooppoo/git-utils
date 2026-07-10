@@ -10,7 +10,8 @@
 				"EditorConfig.EditorConfig"
 			]
 		}
-	}
+	},
+  "postCreateCommand": "sh scripts/setup-dev.sh"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
