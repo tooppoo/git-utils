@@ -9,75 +9,66 @@ main() {
   force=0
 
   while [ "$#" -gt 0 ]; do
-  case "$1" in
-    --dry-run)
-    dry_run=1
-    shift
-    ;;
-    --force|-f)
-    force=1
-    shift
-    ;;
-    --help|-h)
-    usage
-    exit 0
-    ;;
-    --)
-    shift
-    break
-    ;;
-    -*)
-    die "unknown option: $1"
-    ;;
-    *)
-    break
-    ;;
-  esac
+    case "$1" in
+      --dry-run)
+        dry_run=1
+        shift
+        ;;
+      --force|-f)
+        force=1
+        shift
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        break
+        ;;
+      -*)
+        die "unknown option: $1"
+        ;;
+      *)
+      break
+      ;;
+    esac
   done
 
   if [ "$#" -eq 0 ]; then
-  usage
-  exit 2
+    usage
+    exit 2
   fi
 
   git rev-parse --git-dir >/dev/null 2>&1 ||
     die "not a git repository"
 
-  current_branch=$(
-    git symbolic-ref --quiet --short HEAD 2>/dev/null || true
-  )
+  current_branch=$("git symbolic-ref --quiet --short HEAD 2>/dev/null || true")
 
-  branches=$(
-    git for-each-ref --format='%(refname:short)' refs/heads
-  )
+  branches=$("git for-each-ref --format='%(refname:short)' refs/heads")
 
   matched=''
 
   for branch in $branches; do
-  for pattern in "$@"; do
-    case "$branch" in
-    $pattern)
-      if [ "$branch" = "$current_branch" ]; then
-        die "refusing to delete current branch: $branch"
-      fi
+    for pattern in "$@"; do
+      case "$branch" in
+      "$pattern")
+        if [ "$branch" = "$current_branch" ]; then
+          die "refusing to delete current branch: $branch"
+        fi
 
-      case "
-$matched
-" in
-      *"
-$branch
-"*)
-        ;;
-      *)
-        matched="${matched}${branch}
-"
+        case "$matched" in
+        *"$branch"*)
+          ;;
+        *)
+          matched="${matched}${branch}"
+          ;;
+        esac
+
+        break
         ;;
       esac
-
-      break
-      ;;
-    esac
-  done
+    done
   done
 
   if [ -z "$matched" ]; then
@@ -116,4 +107,4 @@ die() {
   exit 1
 }
 
-main
+main "$@"

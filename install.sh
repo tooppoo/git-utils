@@ -2,7 +2,7 @@
 set -eu
 
 REPO_OWNER="${REPO_OWNER:-tooppoo}"
-REPO_NAME="${REPO_NAME:-git-helpers}"
+REPO_NAME="${REPO_NAME:-git-utils}"
 REF="${REF:-main}"
 INSTALL_DIR="${INSTALL_DIR:-"$HOME/.local/bin"}"
 FORCE=0
@@ -13,31 +13,31 @@ main() {
     usage >&2
     exit 2
   fi
-  
+
   need_cmd chmod
   need_cmd cmp
   need_cmd mkdir
   need_cmd mv
   need_cmd rm
-  
+
   mkdir -p "$INSTALL_DIR"
-  
+
   for helper in "$@"; do
     install_one "$helper"
   done
-  
+
   if ! contains_path "$INSTALL_DIR"; then
     cat >&2 <<EOF
-  
+
   warning: $INSTALL_DIR is not in PATH.
-  
+
   Add this to your shell profile:
-  
+
     export PATH="$INSTALL_DIR:\$PATH"
-  
-  EOF
+
+EOF
   fi
-  
+
   echo "installed git helper commands to $INSTALL_DIR"
 }
 
@@ -47,13 +47,13 @@ usage: install.sh [--force] <git-helper>...
 
 Examples:
   install.sh git-commits-since-tag
-  install.sh git-commits-since-tag git-merges-since-tag
+  install.sh git-commits-since-tag git-rm-branch
 
 Environment variables:
   INSTALL_DIR   Install directory. Default: $HOME/.local/bin
   REF           Git ref to install from. Default: main
   REPO_OWNER    GitHub owner. Default: tooppoo
-  REPO_NAME     GitHub repository. Default: git-helpers
+  REPO_NAME     GitHub repository. Default: git-utils
 EOF
 }
 
