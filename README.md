@@ -16,8 +16,8 @@ git commits-since-tag v1.0.0
 Pass one or more helper names to the installer.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/tooppoo/git-helpers/main/install.sh \
-  | sh -s -- git-commits-since-tag git-merges-since-tag
+curl -fsSL https://raw.githubusercontent.com/tooppoo/git-utils/main/install.sh \
+  | sh -s -- git-commits-since-tag git-rm-branch
 ```
 
 The installer downloads each requested script from `bin/<helper-name>` and installs it into:
@@ -33,7 +33,7 @@ Helpers are installed in the order specified.
 Set `INSTALL_DIR` to install the helpers somewhere else.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/tooppoo/git-helpers/main/install.sh \
+curl -fsSL https://raw.githubusercontent.com/tooppoo/git-utils/main/install.sh \
   | INSTALL_DIR="$HOME/bin" sh -s -- git-commits-since-tag
 ```
 
@@ -49,7 +49,7 @@ By default, the installer downloads helpers from `main`.
 Set `REF` to install from a tag, branch, or commit.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/tooppoo/git-helpers/main/install.sh \
+curl -fsSL https://raw.githubusercontent.com/tooppoo/git-utils/main/install.sh \
   | REF=v0.1.0 sh -s -- git-commits-since-tag
 ```
 
@@ -61,6 +61,6 @@ The installer does not overwrite an existing different file by default.
 Use `--force` only when replacing an existing helper is intended.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/tooppoo/git-helpers/main/install.sh \
+curl -fsSL https://raw.githubusercontent.com/tooppoo/git-utils/main/install.sh \
   | sh -s -- --force git-commits-since-tag
 ```
